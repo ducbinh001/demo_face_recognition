@@ -4,3 +4,5 @@
 - Run npm install on the cloned directory.
 # Running the software
 - npm start
+# Access on browser
+- http://localhost:9000/
