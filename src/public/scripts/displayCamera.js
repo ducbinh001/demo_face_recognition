@@ -4,7 +4,7 @@ const controls = document.querySelector('.controls');
 const cameraOptions = document.querySelector('.video-options>select');
 const video = document.querySelector('video');
 const canvas = document.querySelector('canvas');
-const screenshotImage = document.querySelector('img');
+// const screenshotImage = document.querySelector('img');
 const buttons = [...controls.querySelectorAll('button')];
 var interval = null;
 let streamStarted = false;
@@ -59,7 +59,8 @@ play.onclick = () => {
     };
     startStream(updatedConstraints);
   }
-  setTimeout(detectFace(), 3000);
+  detectFaceOnCamera()
+  // setTimeout(detectFace(), 3000);
 };
 
 const pauseStream = () => {
@@ -69,16 +70,32 @@ const pauseStream = () => {
   clearInterval(interval)
 };
 
-const doScreenshot = () => {
-  canvas.width = video.videoWidth;
-  canvas.height = video.videoHeight;
-  canvas.getContext('2d').drawImage(video, 0, 0);
-  screenshotImage.src = canvas.toDataURL('image/webp');
-  screenshotImage.classList.remove('d-none');
+const detectFaceOnCamera = () => {
+  video.classList.add('d-none');
+  canvas.classList.remove('d-none');
+  interval = setInterval(async () => {
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    let ctx = canvas.getContext('2d');
+    ctx.drawImage(video, 0, 0);
+    // screenshotImage.src = canvas.toDataURL('image/webp');
+    // screenshotImage.classList.remove('d-none');
+
+    console.log("11111111")
+    const result = await faceapi.detectAllFaces(video);
+    result.forEach(ele => {
+      console.log(ele)
+      ctx.beginPath();
+      ctx.lineWidth = "3";
+      ctx.strokeStyle = "red";
+      ctx.rect(ele.box.x, ele.box.y, ele.box.width, ele.box.height);
+      ctx.stroke();
+    })
+  }, 20)
 };
 
 pause.onclick = pauseStream;
-screenshot.onclick = doScreenshot;
+screenshot.onclick = detectFaceOnCamera;
 
 const startStream = async (constraints) => {
   const stream = await navigator.mediaDevices.getUserMedia(constraints);
@@ -90,7 +107,7 @@ const handleStream = (stream) => {
   video.srcObject = stream;
   play.classList.add('d-none');
   pause.classList.remove('d-none');
-  screenshot.classList.remove('d-none');
+  // screenshot.classList.remove('d-none');
 };
 
 
