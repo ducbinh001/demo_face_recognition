@@ -81,10 +81,8 @@ const detectFaceOnCamera = () => {
     // screenshotImage.src = canvas.toDataURL('image/webp');
     // screenshotImage.classList.remove('d-none');
 
-    console.log("11111111")
     const result = await faceapi.detectAllFaces(video);
     result.forEach(ele => {
-      console.log(ele)
       ctx.beginPath();
       ctx.lineWidth = "1";
       ctx.strokeStyle = "red";
@@ -98,20 +96,54 @@ const cropFace = async () => {
   canvas.width = video.videoWidth;
   canvas.height = video.videoHeight;
   const result = await faceapi.detectAllFaces(video);
-  let ele = result[0]
+  var formdata = new FormData();
+  let listFace = []
+  result.forEach(ele => {
+    var tempCanvas = document.createElement("canvas");
+    var tCtx = tempCanvas.getContext("2d");
 
-  var tempCanvas = document.createElement("canvas");
-  var tCtx = tempCanvas.getContext("2d");
+    screenshotImage.setAttribute("width", ele.box.width);
+    screenshotImage.setAttribute("height", ele.box.height);
 
-  screenshotImage.setAttribute("width", ele.box.width);
-  screenshotImage.setAttribute("height", ele.box.height);
+    tempCanvas.width = ele.box.width;
+    tempCanvas.height = ele.box.height;
 
-  tempCanvas.width = ele.box.width;
-  tempCanvas.height = ele.box.height;
+    tCtx.drawImage(canvas, ele.box.x, ele.box.y, ele.box.width, ele.box.height, 0, 0, ele.box.width, ele.box.height);
+    listFace.push({ data: tempCanvas.toDataURL('image/webp') });
+  })
+  formdata.append("listface", listFace)
+  console.log(formdata)
+  callApi({ data: listFace })
 
-  tCtx.drawImage(canvas, ele.box.x, ele.box.y, ele.box.width, ele.box.height, 0, 0, ele.box.width, ele.box.height);
 
-  screenshotImage.src = tempCanvas.toDataURL('image/webp');
+  // Test crop image
+  // let ele = result[0]
+
+  // var tempCanvas = document.createElement("canvas");
+  // var tCtx = tempCanvas.getContext("2d");
+
+  // screenshotImage.setAttribute("width", ele.box.width);
+  // screenshotImage.setAttribute("height", ele.box.height);
+
+  // tempCanvas.width = ele.box.width;
+  // tempCanvas.height = ele.box.height;
+
+  // tCtx.drawImage(canvas, ele.box.x, ele.box.y, ele.box.width, ele.box.height, 0, 0, ele.box.width, ele.box.height);
+
+  // screenshotImage.src = tempCanvas.toDataURL('image/webp');
+}
+
+const callApi = (data) => {
+  var xmlhttp = new XMLHttpRequest();
+  xmlhttp.open("POST", "http://172.16.11.202:5000/detect", true);
+  xmlhttp.setRequestHeader("Content-Type", "application/json");
+  xmlhttp.onreadystatechange = function () {
+    if (xmlhttp.readyState == XMLHttpRequest.DONE) {
+      console.log("Call API DONE")
+      alert(xmlhttp.responseText);
+    }
+  }
+  xmlhttp.send(JSON.stringify(data));
 }
 
 pause.onclick = pauseStream;
