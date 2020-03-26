@@ -2,5 +2,5 @@
 # Install
 - Clone the repo by using git clone.
 - Run npm install on the cloned directory.
-# Run
+# Running the software
 - npm start
