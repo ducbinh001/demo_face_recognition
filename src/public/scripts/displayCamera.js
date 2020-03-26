@@ -6,10 +6,10 @@ const video = document.querySelector('video');
 const canvas = document.querySelector('canvas');
 const screenshotImage = document.querySelector('img');
 const buttons = [...controls.querySelectorAll('button')];
+var interval = null;
 let streamStarted = false;
 
 (async () => {
-  console.log("here")
   await faceapi.nets.ssdMobilenetv1.loadFromUri("/models");
   await faceapi.nets.faceRecognitionNet.loadFromUri("/models");
   await faceapi.nets.faceLandmark68Net.loadFromUri("/models");
@@ -44,7 +44,6 @@ cameraOptions.onchange = () => {
 };
 
 play.onclick = () => {
-  console.log("Play")
   if (streamStarted) {
     video.play();
     play.classList.add('d-none');
@@ -60,12 +59,14 @@ play.onclick = () => {
     };
     startStream(updatedConstraints);
   }
+  setTimeout(detectFace(), 3000);
 };
 
 const pauseStream = () => {
   video.pause();
   play.classList.remove('d-none');
   pause.classList.add('d-none');
+  clearInterval(interval)
 };
 
 const doScreenshot = () => {
@@ -101,5 +102,15 @@ const getCameraSelection = async () => {
   });
   cameraOptions.innerHTML = options.join('');
 };
+
+var detectFace = () => {
+  interval = setInterval(async () => {
+    const result = await faceapi.detectAllFaces(video);
+    console.log(result)
+    if (result.length > 0) {
+      pauseStream()
+    }
+  }, 20)
+}
 
 getCameraSelection();
