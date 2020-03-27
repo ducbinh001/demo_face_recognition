@@ -60,7 +60,6 @@ play.onclick = () => {
     startStream(updatedConstraints);
   }
   detectFaceOnCamera()
-  // setTimeout(detectFace(), 3000);
 };
 
 const pauseStream = () => {
@@ -93,43 +92,24 @@ const detectFaceOnCamera = () => {
   }, 20)
 };
 
-const cropFace = async () => {
+const cropFace = function () {
   canvas.width = video.videoWidth;
   canvas.height = video.videoHeight;
-  const result = await faceapi.detectAllFaces(video);
-  let listFace = []
-  result.forEach((ele, index) => {
-    var tempCanvas = document.createElement("canvas");
-    var tCtx = tempCanvas.getContext("2d");
+  setInterval(async () => {
+    const result = await faceapi.detectAllFaces(video);
+    let listFace = []
+    result.forEach((ele, index) => {
+      var tempCanvas = document.createElement("canvas");
+      var tCtx = tempCanvas.getContext("2d");
 
-    // screenshotImage.setAttribute("width", ele.box.width);
-    // screenshotImage.setAttribute("height", ele.box.height);
+      tempCanvas.width = ele.box.width;
+      tempCanvas.height = ele.box.height;
 
-    tempCanvas.width = ele.box.width;
-    tempCanvas.height = ele.box.height;
-
-    tCtx.drawImage(canvas, ele.box.x, ele.box.y, ele.box.width, ele.box.height, 0, 0, ele.box.width, ele.box.height);
-    // if (index === 0) screenshotImage.src = tempCanvas.toDataURL('image/png');
-    listFace.push({ data: tempCanvas.toDataURL('image/png') });
-  })
-  callApi({ data: listFace })
-
-
-  // Test crop image
-  // let ele = result[0]
-
-  // var tempCanvas = document.createElement("canvas");
-  // var tCtx = tempCanvas.getContext("2d");
-
-  // screenshotImage.setAttribute("width", ele.box.width);
-  // screenshotImage.setAttribute("height", ele.box.height);
-
-  // tempCanvas.width = ele.box.width;
-  // tempCanvas.height = ele.box.height;
-
-  // tCtx.drawImage(canvas, ele.box.x, ele.box.y, ele.box.width, ele.box.height, 0, 0, ele.box.width, ele.box.height);
-
-  // screenshotImage.src = tempCanvas.toDataURL('image/png');
+      tCtx.drawImage(canvas, ele.box.x, ele.box.y, ele.box.width, ele.box.height, 0, 0, ele.box.width, ele.box.height);
+      listFace.push({ data: tempCanvas.toDataURL('image/png') });
+    })
+    callApi({ data: listFace })
+  }, 1000)
 }
 
 const callApi = (data) => {
