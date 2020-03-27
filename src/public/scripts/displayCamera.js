@@ -15,7 +15,7 @@ let streamStarted = false;
   await faceapi.nets.faceLandmark68Net.loadFromUri("/models");
 })();
 
-const [play, pause, screenshot] = buttons;
+// const [pause, screenshot] = buttons;
 
 const constraints = {
   video: {
@@ -43,11 +43,30 @@ cameraOptions.onchange = () => {
   startStream(updatedConstraints);
 };
 
-play.onclick = () => {
+// play.onclick = () => {
+//   if (streamStarted) {
+//     video.play();
+//     play.classList.add('d-none');
+//     pause.classList.remove('d-none');
+//     return;
+//   }
+//   if ('mediaDevices' in navigator && navigator.mediaDevices.getUserMedia) {
+//     const updatedConstraints = {
+//       ...constraints,
+//       deviceId: {
+//         exact: cameraOptions.value
+//       }
+//     };
+//     startStream(updatedConstraints);
+//   }
+//   detectFaceOnCamera()
+// };
+
+setTimeout(() => {
   if (streamStarted) {
     video.play();
-    play.classList.add('d-none');
-    pause.classList.remove('d-none');
+    // play.classList.add('d-none');
+    // pause.classList.remove('d-none');
     return;
   }
   if ('mediaDevices' in navigator && navigator.mediaDevices.getUserMedia) {
@@ -60,12 +79,12 @@ play.onclick = () => {
     startStream(updatedConstraints);
   }
   detectFaceOnCamera()
-};
+}, 1000)
 
 const pauseStream = () => {
   video.pause();
-  play.classList.remove('d-none');
-  pause.classList.add('d-none');
+  // play.classList.remove('d-none');
+  // pause.classList.add('d-none');
   clearInterval(interval)
 };
 
@@ -90,6 +109,7 @@ const detectFaceOnCamera = () => {
       ctx.stroke();
     })
   }, 20)
+  cropFace()
 };
 
 const cropFace = function () {
@@ -134,8 +154,8 @@ const callApi = (data) => {
   xmlhttp.send(JSON.stringify(data));
 }
 
-pause.onclick = pauseStream;
-screenshot.onclick = cropFace;
+// pause.onclick = pauseStream;
+// screenshot.onclick = cropFace;
 
 const startStream = async (constraints) => {
   const stream = await navigator.mediaDevices.getUserMedia(constraints);
@@ -144,9 +164,9 @@ const startStream = async (constraints) => {
 
 const handleStream = (stream) => {
   video.srcObject = stream;
-  play.classList.add('d-none');
-  pause.classList.remove('d-none');
-  screenshot.classList.remove('d-none');
+  // play.classList.add('d-none');
+  // pause.classList.remove('d-none');
+  // screenshot.classList.remove('d-none');
 };
 
 
