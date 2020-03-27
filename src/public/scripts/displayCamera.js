@@ -73,6 +73,7 @@ const pauseStream = () => {
 const detectFaceOnCamera = () => {
   video.classList.add('d-none');
   canvas.classList.remove('d-none');
+  canvas.classList.add("canvas-position");
   interval = setInterval(async () => {
     canvas.width = video.videoWidth;
     canvas.height = video.videoHeight;
@@ -140,9 +141,7 @@ const callApi = (data) => {
       let showName = document.getElementById("show-name");
       showName.innerHTML = ""
       let p = document.createElement("p");
-      console.log(xmlhttp.responseText)
       let data = JSON.parse(xmlhttp.responseText);
-      console.log(data)
       data.forEach(ele => {
         let text = document.createTextNode(ele.cls);
         p.appendChild(text)
