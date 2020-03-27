@@ -147,6 +147,9 @@ const callApi = (data) => {
         p.appendChild(text)
         let br = document.createElement("br");
         p.appendChild(br);
+        let prob = document.createTextNode(ele.prob);
+        p.appendChild(prob)
+        p.appendChild(br);
       })
       showName.appendChild(p)
     }
