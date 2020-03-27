@@ -29,6 +29,12 @@ video {
   left: 20px;
   top: 30px;
 }
+.p-name-options {
+  position: absolute;
+  left: 20px;
+  top: 80px;
+  color: red;
+}
 
 .controls {
   position: absolute;

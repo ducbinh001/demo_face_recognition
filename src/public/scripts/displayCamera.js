@@ -1,10 +1,10 @@
 feather.replace();
 
 const controls = document.querySelector('.controls');
-const cameraOptions = document.querySelector('.video-options>select');
+const cameraOptions = document.getElementById('video-options');
 const video = document.querySelector('video');
 const canvas = document.querySelector('canvas');
-const screenshotImage = document.querySelector('img');
+// const screenshotImage = document.querySelector('img');
 const buttons = [...controls.querySelectorAll('button')];
 var interval = null;
 let streamStarted = false;
@@ -78,7 +78,7 @@ const detectFaceOnCamera = () => {
     canvas.height = video.videoHeight;
     let ctx = canvas.getContext('2d');
     ctx.drawImage(video, 0, 0);
-    // screenshotImage.src = canvas.toDataURL('image/webp');
+    // screenshotImage.src = canvas.toDataURL('image/png');
     // screenshotImage.classList.remove('d-none');
 
     const result = await faceapi.detectAllFaces(video);
@@ -96,23 +96,21 @@ const cropFace = async () => {
   canvas.width = video.videoWidth;
   canvas.height = video.videoHeight;
   const result = await faceapi.detectAllFaces(video);
-  var formdata = new FormData();
   let listFace = []
-  result.forEach(ele => {
+  result.forEach((ele, index) => {
     var tempCanvas = document.createElement("canvas");
     var tCtx = tempCanvas.getContext("2d");
 
-    screenshotImage.setAttribute("width", ele.box.width);
-    screenshotImage.setAttribute("height", ele.box.height);
+    // screenshotImage.setAttribute("width", ele.box.width);
+    // screenshotImage.setAttribute("height", ele.box.height);
 
     tempCanvas.width = ele.box.width;
     tempCanvas.height = ele.box.height;
 
     tCtx.drawImage(canvas, ele.box.x, ele.box.y, ele.box.width, ele.box.height, 0, 0, ele.box.width, ele.box.height);
-    listFace.push({ data: tempCanvas.toDataURL('image/webp') });
+    // if (index === 0) screenshotImage.src = tempCanvas.toDataURL('image/png');
+    listFace.push({ data: tempCanvas.toDataURL('image/png') });
   })
-  formdata.append("listface", listFace)
-  console.log(formdata)
   callApi({ data: listFace })
 
 
@@ -130,17 +128,28 @@ const cropFace = async () => {
 
   // tCtx.drawImage(canvas, ele.box.x, ele.box.y, ele.box.width, ele.box.height, 0, 0, ele.box.width, ele.box.height);
 
-  // screenshotImage.src = tempCanvas.toDataURL('image/webp');
+  // screenshotImage.src = tempCanvas.toDataURL('image/png');
 }
 
 const callApi = (data) => {
   var xmlhttp = new XMLHttpRequest();
-  xmlhttp.open("POST", "http://172.16.11.202:5000/detect", true);
+  xmlhttp.open("POST", "http://ai.nccsoft.vn:8888/face", true);
   xmlhttp.setRequestHeader("Content-Type", "application/json");
   xmlhttp.onreadystatechange = function () {
-    if (xmlhttp.readyState == XMLHttpRequest.DONE) {
-      console.log("Call API DONE")
-      alert(xmlhttp.responseText);
+    if (xmlhttp.status == 200) {
+      let showName = document.getElementById("show-name");
+      showName.innerHTML = ""
+      let p = document.createElement("p");
+      console.log(xmlhttp.responseText)
+      let data = JSON.parse(xmlhttp.responseText);
+      console.log(data)
+      data.forEach(ele => {
+        let text = document.createTextNode(ele.cls);
+        p.appendChild(text)
+        let br = document.createElement("br");
+        p.appendChild(br);
+      })
+      showName.appendChild(p)
     }
   }
   xmlhttp.send(JSON.stringify(data));
@@ -174,7 +183,6 @@ const getCameraSelection = async () => {
 var detectFace = () => {
   interval = setInterval(async () => {
     const result = await faceapi.detectAllFaces(video);
-    console.log(result)
     if (result.length > 0) {
       pauseStream()
     }
